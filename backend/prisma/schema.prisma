@@ -1,0 +1,219 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Token {
+  id        String          @id @default(uuid())
+  mint      String          @unique
+  name      String
+  symbol    String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  analyses  TokenAnalysis[]
+  positions Position[]
+}
+
+model TokenAnalysis {
+  id                     String   @id @default(uuid())
+  tokenId                String
+  token                  Token    @relation(fields: [tokenId], references: [id])
+  timestamp              DateTime @default(now())
+
+  top10HoldersPercent    Float
+  insidersPercent        Float
+  snipersPercent         Float
+
+  devWallet              String
+  devSoldPercent         Float
+
+  marketCap              Float
+  liquidity              Float
+  volume1h               Float
+
+  rugCheckScore          Float
+  bundledWalletsDetected Boolean
+  dexPaid                Boolean
+  graduated              Boolean
+
+  confidenceScore        Float
+  riskScore              Float
+  potentialScore         Float
+  masterKPI              Float
+
+  approved               Boolean
+  rejectionReasons       String[] @default([])
+  warnings               String[] @default([])
+
+  @@index([tokenId, timestamp])
+}
+
+model Position {
+  id                  String         @id @default(uuid())
+  tokenId             String
+  token               Token          @relation(fields: [tokenId], references: [id])
+
+  entryPrice          Float
+  entryTimestamp      DateTime       @default(now())
+  amount              Float
+  amountSOL           Float
+  kpi                 Float
+
+  takeProfitPrice     Float
+  takeProfitPercent   Float
+  stopLossPrice       Float
+  stopLossPercent     Float
+  trailingStopPercent Float
+  moonbagPercent      Float
+
+  status              PositionStatus @default(ACTIVE)
+
+  exits               TradeExit[]
+
+  @@index([status])
+  @@index([tokenId])
+}
+
+enum PositionStatus {
+  ACTIVE
+  PARTIAL_EXIT
+  CLOSED
+}
+
+model TradeExit {
+  id         String   @id @default(uuid())
+  positionId String
+  position   Position @relation(fields: [positionId], references: [id])
+
+  timestamp  DateTime @default(now())
+  price      Float
+  amount     Float
+  amountSOL  Float
+  type       ExitType
+  pnl        Float
+  pnlPercent Float
+
+  @@index([positionId])
+}
+
+enum ExitType {
+  TAKE_PROFIT
+  STOP_LOSS
+  TRAILING_STOP
+  MANUAL
+}
+
+model Incident {
+  id           String           @id @default(uuid())
+  timestamp    DateTime         @default(now())
+  severity     Severity
+  category     IncidentCategory
+  component    String
+  description  String
+  errorCode    String?
+  errorMessage String?
+  stack        String?
+  context      Json
+  status       IncidentStatus   @default(OPEN)
+  assignedTo   String?
+  resolution   String?
+  resolvedAt   DateTime?
+
+  @@index([status, severity])
+  @@index([category])
+}
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum IncidentCategory {
+  RPC_ERROR
+  API_ERROR
+  EXECUTION_ERROR
+  DATA_ERROR
+  SYSTEM_ERROR
+}
+
+enum IncidentStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model Problem {
+  id           String        @id @default(uuid())
+  incidentIds  String[]      @default([])
+  rootCause    String
+  workaround   String?
+  permanentFix String?
+  status       ProblemStatus @default(IDENTIFIED)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+enum ProblemStatus {
+  IDENTIFIED
+  INVESTIGATING
+  KNOWN_ERROR
+  RESOLVED
+}
+
+model KnowledgeArticle {
+  id               String   @id @default(uuid())
+  title            String
+  category         String
+  problem          String
+  solution         String
+  tags             String[] @default([])
+  relatedIncidents String[] @default([])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([category])
+}
+
+model Change {
+  id           String       @id @default(uuid())
+  title        String
+  description  String
+  type         ChangeType
+  impact       ChangeImpact
+  requestedBy  String
+  approvedBy   String?
+  scheduledFor DateTime
+  status       ChangeStatus @default(REQUESTED)
+  rollbackPlan String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+enum ChangeType {
+  FEATURE
+  BUGFIX
+  HOTFIX
+  CONFIGURATION
+}
+
+enum ChangeImpact {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ChangeStatus {
+  REQUESTED
+  APPROVED
+  IN_PROGRESS
+  DEPLOYED
+  ROLLED_BACK
+}

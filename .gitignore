@@ -1,0 +1,9 @@
+﻿node_modules/
+**/node_modules/
+dist/
+coverage/
+.env
+.env.local
+*.log
+backend/prisma/dev.db
+frontend/.vite

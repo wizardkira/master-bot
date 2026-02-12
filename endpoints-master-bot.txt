@@ -1,0 +1,98 @@
+﻿MASTER BOT - ENDPOINTS (resumo legivel)
+
+CORE EXECUCAO
+1) RPC_URL_PRIMARY / SECONDARY / TERTIARY (Solana JSON-RPC)
+   Retorno: result/error (slot, balance, account info, send tx)
+   Potencial: base do bot (leitura on-chain + execucao)
+
+2) RPC_WSS_URL / PUMPFUN_PROGRAM_WSS_URL
+   Retorno: subscription id + eventos de conta/programa
+   Potencial: reacao em tempo real
+
+3) wss://pumpportal.fun/api/data
+   Retorno: novos tokens (mint, symbol, marketCapSol, etc.)
+   Potencial: discovery rapido
+
+4) https://pumpportal.fun/api/trade-local
+   Retorno: transacao serializada (buy/sell)
+   Potencial: execucao rapida pump/raydium
+
+PUMP.FUN MARKET DATA
+5) https://swap-api.pump.fun/v1/coins/{mint}/market-activity?program=pump
+   Retorno: 5m/1h com volumeUSD, numBuys, numSells, etc.
+   Potencial: filtros de tracao
+
+6) https://swap-api.pump.fun/v2/coins/{mint}/trades?... 
+   Retorno: trades (type, amountSol, timestamp)
+   Potencial: detectar whale e dump
+
+7) https://frontend-api-v3.pump.fun/coins/{mint}
+   Retorno: dados do token (usd_market_cap, name, symbol)
+   Potencial: filtro por mcap
+
+8) https://frontend-api-v3.pump.fun/coins-v2/{mint}
+   Retorno: creator, socials, reserves, timestamps
+   Potencial: due diligence
+
+9) https://frontend-api-v3.pump.fun/coins/{mint}/holders?...
+   Retorno: holders e percentuais
+   Potencial: risco de concentracao/rug
+
+10) Endpoints de listagem:
+    - /coins/recommended
+    - /coins/currently-live
+    - /coins/trending-search-v2
+    - /coins?sort=...
+    Retorno: arrays de tokens
+    Potencial: scanners new/movers/traction
+
+11) https://frontend-api-v3.pump.fun/callout/list/{id}?...
+    Retorno: callouts com coin/token/mint
+    Potencial: sinais sociais curados
+
+12) https://advanced-api-v2.pump.fun/coins/kolscan
+    https://advanced-api-v2.pump.fun/coins/graduated
+    Retorno: coins (coinMint, marketCap, creationTime)
+    Potencial: universo alternativo de entrada
+
+RISCO E VALIDACAO
+13) https://api.rugcheck.xyz/v1/tokens/{mint}/report
+    Retorno: score_normalised, risks, topHolders, rugged
+    Potencial: bloquear tokens ruins pre/pós-compra
+
+14) https://app.insightx.network/api/portal/bubblemap/getBubblemap
+    Retorno: mapa de holders conectados
+    Potencial: detectar distribuicao artificial
+
+15) https://api.dexscreener.com/token-boosts/top/v1
+    https://api.dexscreener.com/token-profiles/latest/v1
+    Retorno: listas com chainId/tokenAddress
+    Potencial: fallback de discovery
+
+PRECO E ROTEAMENTO
+16) https://api.jup.ag/price/v2?ids=So11111111111111111111111111111111111111112
+    Retorno: preco SOL
+    Potencial: metricas em USD
+
+17) https://api.jup.ag/swap/v1/quote
+    Retorno: quote/routePlan/priceImpact
+    Potencial: melhor rota de execucao
+
+18) https://api.jup.ag/swap/v1/swap
+    Retorno: swapTransaction (base64)
+    Potencial: execucao em tokens migrados
+
+INFRA EXTRA
+19) {JITO_BLOCK_ENGINE_URL}/api/v1/bundles
+    Retorno: bundleId/status/tip accounts
+    Potencial: melhor landing em alta competicao
+
+20) https://api.telegram.org/bot{TOKEN}/getUpdates
+    https://api.telegram.org/bot{TOKEN}/getMe
+    Retorno: sinais + status do bot
+    Potencial: entradas por sinal externo
+
+AUXILIARES
+21) https://pump.fun/coin/{mint} (link)
+22) https://twitter.com/{user}/status/{id} (link)
+23) https://api.devnet.solana.com (teste/integracao)
